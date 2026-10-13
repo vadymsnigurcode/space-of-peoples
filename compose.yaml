@@ -1,6 +1,7 @@
 services:
   app:
-    build: .
+    build:
+      context: ./app-service
     depends_on:
       db:
         condition: service_healthy
@@ -10,6 +11,17 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-spaceofpeoples}
     ports:
       - "8080:8080"
+
+  frontend:
+    build:
+      context: ./frontend
+    depends_on:
+      app:
+        condition: service_started
+    environment:
+      BACKEND_URL: http://app:8080
+    ports:
+      - "5173:5173"
 
   db:
     image: postgres:17-alpine
@@ -23,9 +35,9 @@ services:
       timeout: 5s
       retries: 10
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5433}:5432"
     volumes:
-      - ./docker/postgres/init/001_create_workers.sql:/docker-entrypoint-initdb.d/001_create_workers.sql:ro
+      - ./migration-db/001_create_workers.sql:/docker-entrypoint-initdb.d/001_create_workers.sql:ro
       - postgres_data:/var/lib/postgresql/data
 
 volumes:

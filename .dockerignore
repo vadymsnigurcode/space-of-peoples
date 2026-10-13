@@ -1,3 +1,5 @@
 .git
 .vscode
 target
+frontend/node_modules
+frontend/dist
