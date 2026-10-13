@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-@Repository
+@Repository("jdbcWorkerRepository")
 public class WorkerRepository {
 
 	private static final String SELECT_COLUMNS = "id, first_name, last_name, email";

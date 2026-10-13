@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-@Repository
+@Repository("jooqWorkerRepository")
 public class WorkerRepository {
 
 	private static final Table<?> WORKERS = DSL.table(DSL.name("workers"));
