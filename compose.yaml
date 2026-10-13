@@ -1,5 +1,32 @@
 services:
   app:
     build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-space_of_peoples}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-spaceofpeoples}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-spaceofpeoples}
     ports:
       - "8080:8080"
+
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-space_of_peoples}
+      POSTGRES_USER: ${POSTGRES_USER:-spaceofpeoples}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-spaceofpeoples}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./docker/postgres/init/001_create_workers.sql:/docker-entrypoint-initdb.d/001_create_workers.sql:ro
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
